@@ -12,11 +12,8 @@ class InfoView(web.View):
 
     @classmethod
     def json_response(cls, result, message: str, extra: str = ''):
-        return web.json_response({
-            'result': result,
-            'message': message,
-            'extra': extra
-        })
+        response_data = InfoWeather.response_data(result, message, extra)
+        return web.json_response(response_data)
 
     def get_post_params(self) -> tuple:
         city = self.request.query.get('city')
@@ -47,19 +44,18 @@ class InfoView(web.View):
 
         weather_model = WeatherModel(self.request, city, country_code, parsed_date)
 
-        result: dict = await weather_model.select()
-        if result and 'message' in result.keys():
-            return self.json_response(**result)
+        data: dict = await weather_model.select()
+        if data and 'message' in data.keys():
+            return self.json_response(**data)
 
         open_weather = ApiOpenWeather(city=city, date=date)
         async with aiohttp.ClientSession() as session:
             await asyncio.gather(asyncio.create_task(open_weather.find(session=session)))
 
-            if len(open_weather.weathers) > 0:
-                info = open_weather.weathers[0]
-
-                await weather_model.insert(info)
-                return self.json_response(info.to_json(), 'ok', 'From API')
-            else:
-                message = f'Failed to determine the weather for {date} for {city},{country_code}'
-                return self.json_response('', message, 'ErrorNotDateInterval')
+        if len(open_weather.weathers) > 0:
+            info = open_weather.weathers[0]
+            await weather_model.insert(info)
+            return self.json_response(info.dumps(), 'ok', 'From API')
+        else:
+            message = f'Failed to determine the weather for {date} for {city},{country_code}'
+            return self.json_response('', message, 'ErrorNotDateInterval')

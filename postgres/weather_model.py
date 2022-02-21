@@ -12,19 +12,11 @@ class WeatherModel:
         self.country_code = country_code
         self.date_dt = date_dt
 
-    @property
-    def response_data(self) -> dict:
-        return {
-            'result': '',
-            'extra': 'From DB',
-            'message': 'error'}
-
     @classmethod
     async def prepare_pk(cls, connect) -> int:
         _last = await connect.execute(select(weather).order_by(weather.c.id.desc()))
         last = await _last.first()
-        pk = last[0] + 1
-        return pk
+        return last[0] + 1 if last else 1
 
     async def select(self):
         async with self.request.app['db'].acquire() as conn:
@@ -34,23 +26,13 @@ class WeatherModel:
             )
 
             records = await result.fetchall()
-            response_data = self.response_data
 
             if len(records) > 1:
-                response_data.update({
-                    'result': str(records),
-                    'message': f'Manu entries in the database with so parameters: city: {self.city}, country_code: {self.country_code}, date: {self.date_dt}'
-                })
-                return response_data
+                message = f'Manu entries in the database with so parameters: city: {self.city}, country_code: {self.country_code}, date: {self.date_dt}'
+                return InfoWeather.response_data(str(records), message)
             elif len(records) == 1:
-                data = dict(records[0])
-                info_weather = InfoWeather(**data)
-
-                response_data.update({
-                    'result': info_weather.to_json(),
-                    'message': 'ok',
-                })
-                return response_data
+                info_weather = InfoWeather(**dict(records[0]))
+                return info_weather.response_data(info_weather.to_json(), 'ok')
 
     async def insert(self, info: InfoWeather):
         async with self.request.app['db'].acquire() as conn:

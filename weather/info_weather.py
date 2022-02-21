@@ -1,5 +1,3 @@
-import json
-import math
 from datetime import datetime
 from typing import Union
 
@@ -23,15 +21,13 @@ class InfoWeather:
     def __repr__(self):
         return f'<InfoWeather: {self.city} {self.country_code} {self.date}>'
 
-    @property
-    def info(self) -> str:
-        return f'''{self}
-        Погодные условия:   {self.desc}
-        Температура:        {math.floor(self.temp - 273.16)} % ({self.temp} по Кельвину)
-        Давление:           {self.pressure} гПа
-        Влажность:          {self.humidity} %
-        Скорость ветра:     {self.wind} м/с
-        '''
+    @classmethod
+    def response_data(cls, result=None, message: str = 'From DB', extra: str = 'error') -> dict:
+        return {
+            'result': result,
+            'message': message,
+            'extra': extra
+        }
 
     @classmethod
     def parse_date(cls, date: str) -> Union[datetime, dict]:
@@ -40,33 +36,15 @@ class InfoWeather:
             y, m, d = [int(d) for d in date.split('-') if d.isdigit()]
             return datetime(y, m, d, cls.HOURS, cls.MINUTE, cls.SECOND)
         except ValueError as e:
-            return {
-                'message': str(e).capitalize(),
-                'extra': 'ValueError of date'
-            }
+            return cls.response_data('no', str(e).capitalize(), 'ValueError of date')
 
     @staticmethod
     def error_query_parameters() -> dict:
         message = '''You should pass the `city, country_code, date` parameters to get a specific weather info.
         Example query: /weather?city=Ivanovo&country_code&ru$date=2022-02-21'''
-        return {
-            'message': message,
-            'extra': '[warn]: ErrorQueryParameters::'
-        }
+        return InfoWeather.response_data('', message, '[warn]: ErrorQueryParameters')
 
-    @staticmethod
-    def default_converter(obj):
-        if isinstance(obj, datetime):
-            return obj.__str__()
-
-    def to_json(self):
+    def to_json(self) -> dict:
         data = self.__dict__
-        return json.dumps(
-            data,
-            sort_keys=False,
-            indent=4,
-            ensure_ascii=False,
-            separators=(',', ': '),
-            default=self.default_converter,
-            allow_nan=True
-        )
+        data['date'] = str(data['date'])
+        return data

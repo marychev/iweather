@@ -12,3 +12,11 @@ CREATE DATABASE iweather;
 CREATE USER postgres WITH PASSWORD 'password';
 GRANT ALL PRIVILEGES ON DATABASE iweather TO postgres;
 > ```
+
+
+# Work Api
+Example requests to get weather information
+```
+/weather?city=London&date=2022-02-21
+/weather?city=London&country_code=en&date=2022-02-22
+```

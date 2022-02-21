@@ -15,18 +15,17 @@ def sample_data(engine):
     conn = engine.connect()
 
     conn.execute(db.weather.delete())
-    conn.execute(db.weather.insert(), [
-        {"city": "Ivanovo",
-         "id": 1,
-         "country_code": "",
-         "date": '2022-02-18 12:00:00.629+02',
-         "desc": "Snow, light snow",
-         "temp": 273.57,
-         "pressure": 992,
-         "humidity": 98,
-         "wind": 4.74
-         }
-    ])
+    conn.execute(db.weather.insert(), [{
+        "id": 1,
+        "city": "Ivanovo",
+        "country_code": "",
+        "date": '2022-02-18 12:00:00',
+        "desc": "Snow, light snow",
+        "temp": 273.57,
+        "pressure": 992,
+        "humidity": 98,
+        "wind": 4.74
+    }])
     conn.close()
 
 

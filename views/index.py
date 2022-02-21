@@ -11,8 +11,8 @@ class IndexView(web.View):
         async with self.request.app['db'].acquire() as conn:
             cursor = await conn.execute(db.weather.select())
             records = await cursor.fetchall()
-            result = [InfoWeather(**dict(q)).__dict__ for q in records]
+            result = [InfoWeather(**dict(q)).to_json() for q in records]
 
             return web.json_response({
-                'result': str(result),
+                'result': result,
             })
