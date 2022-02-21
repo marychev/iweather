@@ -5,6 +5,8 @@
       <sourceFolder url="file://$MODULE_DIR$/config" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/db" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/postgres" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/views" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/weather" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
     </content>

@@ -30,13 +30,11 @@ class InfoWeather:
         }
 
     @classmethod
-    def parse_date(cls, date: str) -> Union[datetime, dict, None]:
+    def parse_date(cls, date: str) -> Union[datetime, dict]:
         try:
-            if date:
-                y, m, d = [int(d) for d in date.split('-') if d.isdigit()]
-                return datetime(y, m, d, cls.HOURS, cls.MINUTE, cls.SECOND)
-            return
-        except ValueError as e:
+            y, m, d = [int(d) for d in date.split('-') if d.isdigit()]
+            return datetime(y, m, d, cls.HOURS, cls.MINUTE, cls.SECOND)
+        except Exception as e:
             return cls.response_data('no', str(e).capitalize(), 'ValueError of date')
 
     def to_json(self) -> dict:

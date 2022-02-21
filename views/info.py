@@ -25,7 +25,7 @@ class InfoView(web.View):
         city, country_code, date = self.get_request_params()
         _date = InfoWeather.parse_date(date)
 
-        if _date and isinstance(_date, dict):
+        if _date and isinstance(_date, dict) or not date:
             return False, tuple(_date.values())
         if not city and not _date or city.isdigit():
             return False, tuple(InfoWeather.error_query_parameters().values())
@@ -44,7 +44,7 @@ class InfoView(web.View):
         if data and 'message' in data.keys():
             return self.json_response(**data)
 
-        open_weather = ApiOpenWeather(city=city, date=str(date))
+        open_weather = ApiOpenWeather(city=city, date=date)
         async with aiohttp.ClientSession() as session:
             await asyncio.gather(asyncio.create_task(open_weather.find(session=session)))
 

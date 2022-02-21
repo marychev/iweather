@@ -9,17 +9,9 @@ class ApiOpenWeather:
     weathers = []
 
     def __init__(self, city: str, date: datetime, country_code: str = ''):
-        self.city = city
-        self._date = self.validate_date(date)
+        self.city = city.title()
+        self.date = self.validate_date(date)
         self.country_code = country_code.lower()
-
-    @property
-    def date(self) -> str:
-        return self._date
-
-    @date.setter
-    def date(self, value: datetime) -> None:
-        self._date = self.validate_date(value)
 
     @property
     def url(self) -> str:
@@ -35,7 +27,7 @@ class ApiOpenWeather:
             return f'{value} {InfoWeather.HOURS}:00:00'
         return value
 
-    async def fetch(self, session: aiohttp.ClientSession) -> list:
+    async def fetch(self, session) -> list:
         async with session.get(self.url) as response:
             val = []
             try:
@@ -59,15 +51,3 @@ class ApiOpenWeather:
     def serialize(self, data: dict) -> InfoWeather:
         data.update({'city': self.city, 'country_code': self.country_code})
         return InfoWeather(**data)
-
-
-# Response:
-# 'dt': 1645531200,
-# 'main': {
-#   'temp': 273.36, 'feels_like': 268.6, 'temp_min': 273.36, 'temp_max': 273.36,
-#   'pressure': 1003, 'sea_level': 1003, 'grnd_level': 987, 'humidity': 99, 'temp_kf': 0},
-# 'weather': [{'id': 601, 'main': 'Snow', 'description': 'snow', 'icon': '13d'}],
-# 'clouds': {'all': 100}, 'wind': {'speed': 4.83, 'deg': 187, 'gust': 11.13},
-# 'visibility': 46, 'pop': 1, 'snow': {'3h': 1.7}, 'sys': {'pod': 'd'},
-# 'dt_txt': '2022-02-22 12:00:00',
-# 'city': 'Ivanovo', 'country_code': 'ru'

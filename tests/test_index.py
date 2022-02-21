@@ -7,7 +7,7 @@ class IndexApiTestCase(AioHTTPTestCase):
     async def get_application(self) -> web.Application:
         return init_app()
 
-    async def test_success_result(self):
+    async def test_success_status(self):
         async with self.client.request("GET", "/") as resp:
             self.assertEqual(resp.status, 200)
             data = await resp.json()
@@ -16,7 +16,7 @@ class IndexApiTestCase(AioHTTPTestCase):
         result = data.get('result')
         self.assertIsInstance(result, list)
 
-    async def test_result_keys(self):
+    async def test_result_keys_valid(self):
         async with self.client.request("GET", "/") as resp:
             self.assertEqual(resp.status, 200)
             data = await resp.json()
