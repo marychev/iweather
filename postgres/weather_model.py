@@ -32,7 +32,7 @@ class WeatherModel:
                 return InfoWeather.response_data(str(records), message)
             elif len(records) == 1:
                 info_weather = InfoWeather(**dict(records[0]))
-                return info_weather.response_data(info_weather.to_json(), 'ok')
+                return info_weather.response_data(info_weather.to_json(), 'ok', 'From DB')
 
     async def insert(self, info: InfoWeather):
         async with self.request.app['db'].acquire() as conn:

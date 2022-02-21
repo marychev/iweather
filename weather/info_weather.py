@@ -30,21 +30,22 @@ class InfoWeather:
         }
 
     @classmethod
-    def parse_date(cls, date: str) -> Union[datetime, dict]:
-        _date = None
+    def parse_date(cls, date: str) -> Union[datetime, dict, None]:
         try:
-            y, m, d = [int(d) for d in date.split('-') if d.isdigit()]
-            return datetime(y, m, d, cls.HOURS, cls.MINUTE, cls.SECOND)
+            if date:
+                y, m, d = [int(d) for d in date.split('-') if d.isdigit()]
+                return datetime(y, m, d, cls.HOURS, cls.MINUTE, cls.SECOND)
+            return
         except ValueError as e:
             return cls.response_data('no', str(e).capitalize(), 'ValueError of date')
+
+    def to_json(self) -> dict:
+        data = self.__dict__
+        data['date'] = str(data['date'])
+        return data
 
     @staticmethod
     def error_query_parameters() -> dict:
         message = '''You should pass the `city, country_code, date` parameters to get a specific weather info.
         Example query: /weather?city=Ivanovo&country_code&ru$date=2022-02-21'''
         return InfoWeather.response_data('', message, '[warn]: ErrorQueryParameters')
-
-    def to_json(self) -> dict:
-        data = self.__dict__
-        data['date'] = str(data['date'])
-        return data

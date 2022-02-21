@@ -29,27 +29,28 @@ class ApiOpenWeather:
         return f"{url},{self.country_code}"
 
     @classmethod
-    def validate_date(cls, value: str) -> str:
-        if value == '':
-            today = datetime.date.today()
-            return f'{today.year}-{today.month}-{today.day+1} {InfoWeather.HOURS}:00:00'
-        elif f"{InfoWeather.HOURS}:00" not in value and "-" in value:
+    def validate_date(cls, value: datetime) -> str:
+        value = str(value)
+        if f"{InfoWeather.HOURS}:00" not in value and "-" in value:
             return f'{value} {InfoWeather.HOURS}:00:00'
         return value
 
     async def find(self, session: aiohttp.ClientSession) -> list[InfoWeather]:
         async with session.get(self.url) as response:
-            assert response.status == 200
-            _json = await response.json()
+            try:
+                assert response.status == 200
+                _json = await response.json()
 
-            for key, val in _json.items():
-                if key == 'cod' and int(val) != 200:
-                    raise Exception(f"Code has not 200: {key}: {val}")
+                for key, val in _json.items():
+                    if key == 'cod' and int(val) != 200:
+                        raise Exception(f"Code has not 200: {key}: {val}")
 
-                if key == 'list' and isinstance(val, list):
-                    self.weathers = [self.serialize(data) for data in val if (self.date in data.get('dt_txt'))]
+                    if key == 'list' and isinstance(val, list):
+                        self.weathers = [self.serialize(data) for data in val if (self.date in data.get('dt_txt'))]
 
-            return self.weathers
+                return self.weathers
+            except AssertionError as e:
+                pass
 
     async def get_all_weathers(self, session: aiohttp.ClientSession) -> list[InfoWeather]:
         async with session.get(self.url) as response:
