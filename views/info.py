@@ -26,19 +26,18 @@ class InfoView(web.View):
         _date = InfoWeather.parse_date(date)
 
         if _date and isinstance(_date, dict):
-            return False, self.json_response('', _date.get('message'), _date.get('extra'))
+            return False, tuple(_date.values())
         if not city and not _date or city.isdigit():
-            err = InfoWeather.error_query_parameters()
-            return False, self.json_response('', err.get('message'), err.get('extra'))
+            return False, tuple(InfoWeather.error_query_parameters().values())
 
-        return True, [city, country_code, _date]
+        return True, (city, _date, country_code)
 
     async def get(self):
         has_valid, json_response = self.validation()
         if not has_valid:
-            return self.json_response(**json_response)
+            return self.json_response(*json_response)
 
-        city, country_code, date = json_response
+        city, date, country_code = json_response
         weather_model = WeatherModel(self.request, city, country_code, date)
 
         data: dict = await weather_model.select()

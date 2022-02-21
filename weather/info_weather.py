@@ -48,4 +48,4 @@ class InfoWeather:
     def error_query_parameters() -> dict:
         message = '''You should pass the `city, country_code, date` parameters to get a specific weather info.
         Example query: /weather?city=Ivanovo&country_code&ru$date=2022-02-21'''
-        return InfoWeather.response_data('', message, '[warn]: ErrorQueryParameters')
+        return InfoWeather.response_data('no', message, '[warn]: ErrorQueryParameters')

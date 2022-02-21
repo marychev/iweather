@@ -8,17 +8,17 @@ class ApiOpenWeather:
     URL = f"https://api.openweathermap.org/data/2.5/forecast?appid={API_KEY}"
     weathers = []
 
-    def __init__(self, city, country_code='', date=''):
+    def __init__(self, city: str, date: datetime, country_code: str = ''):
         self.city = city
-        self.country_code = country_code.lower()
         self._date = self.validate_date(date)
+        self.country_code = country_code.lower()
 
     @property
     def date(self) -> str:
         return self._date
 
     @date.setter
-    def date(self, value) -> None:
+    def date(self, value: datetime) -> None:
         self._date = self.validate_date(value)
 
     @property
@@ -35,36 +35,26 @@ class ApiOpenWeather:
             return f'{value} {InfoWeather.HOURS}:00:00'
         return value
 
-    async def find(self, session: aiohttp.ClientSession) -> list[InfoWeather]:
+    async def fetch(self, session: aiohttp.ClientSession) -> list:
         async with session.get(self.url) as response:
+            val = []
             try:
                 assert response.status == 200
                 _json = await response.json()
-
-                for key, val in _json.items():
-                    if key == 'cod' and int(val) != 200:
-                        raise Exception(f"Code has not 200: {key}: {val}")
-
-                    if key == 'list' and isinstance(val, list):
-                        self.weathers = [self.serialize(data) for data in val if (self.date in data.get('dt_txt'))]
-
-                return self.weathers
-            except AssertionError as e:
+                val = _json.get('list', [])
+            except AssertionError:
                 pass
+            return val
+
+    async def find(self, session: aiohttp.ClientSession) -> list[InfoWeather]:
+        result_list = await self.fetch(session)
+        self.weathers = [self.serialize(data) for data in result_list if (self.date in data.get('dt_txt'))]
+        return self.weathers
 
     async def get_all_weathers(self, session: aiohttp.ClientSession) -> list[InfoWeather]:
-        async with session.get(self.url) as response:
-            assert response.status == 200
-            _json = await response.json()
-
-            for key, val in _json.items():
-                if key == 'cod' and int(val) != 200:
-                    raise Exception(f"Code has not 200: {key}: {val}")
-
-                if key == 'list' and isinstance(val, list):
-                    self.weathers = [self.serialize(data) for data in val]
-
-            return self.weathers
+        result_list = await self.fetch(session)
+        self.weathers = [self.serialize(data) for data in result_list]
+        return self.weathers
 
     def serialize(self, data: dict) -> InfoWeather:
         data.update({'city': self.city, 'country_code': self.country_code})
