@@ -8,7 +8,7 @@ from weather import InfoWeather
 class WeatherModel:
     def __init__(self, request: web.Request, city: str, country_code: str, date_dt: datetime):
         self.request = request
-        self.city = city
+        self.city = city.title()
         self.country_code = country_code
         self.date_dt = date_dt
 

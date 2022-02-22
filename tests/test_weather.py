@@ -1,3 +1,4 @@
+from datetime import datetime
 from urllib.parse import urlparse
 from aiohttp import web
 from aiohttp.test_utils import AioHTTPTestCase
@@ -7,8 +8,10 @@ from weather import InfoWeather, ApiOpenWeather
 
 
 class WeatherApiTestCase(AioHTTPTestCase):
+    today = datetime.today().date()
+    dt = datetime(year=today.year, month=today.month, day=today.day+1).date()
     CITY = 'Ivanovo'
-    DATE = f'2022-02-22'
+    DATE = dt.strftime("%Y-%m-%d")
     URL = f"/weather?city={CITY}&date={DATE}"
 
     async def get_application(self) -> web.Application:
