@@ -1,22 +1,25 @@
-To use PostgreSQL in a more isolated way
+# Install and Run
+
 ```
-docker volume create postgres-data
-docker run -e POSTGRES_PASSWORD=password -e POSTGRES_USER=postgres -p 5432:5432 --name postgres --mount source=postgres-data,target=/var/lib/postgresql  -d postgres:10
-docker exec -it postgres psql -U postgres -h localhost -p 5432 -d iweather
+docker-compose up -d --build
+## Run
+docker-compose up -d
 ```
 
-Init DB
-```
-sudo docker exec -it postgres psql -U postgres
-CREATE DATABASE iweather;
-CREATE USER postgres WITH PASSWORD 'password';
-GRANT ALL PRIVILEGES ON DATABASE iweather TO postgres;
-> ```
+### Cервис получения погоды по API
+Сервис отвечает информацией о погоде, воспользовавшись [Api OpenWeather](https://openweathermap.org/). 
+Выдает информацию о погоде для `Города ` на 12:00 выбранного дня (`2022-02-24`)
+Полученная информация сохраняется и при повторном запросе возвращается из Базы Данных.
 
 
-# Work Api
+
+## Work Api
+
 Example requests to get weather information
-```
-/weather?city=London&date=2022-02-21
-/weather?city=London&country_code=en&date=2022-02-22
-```
+* [localhost:8080](http://0.0.0.0:8080/) - All existing weathers in DB
+* [localhost:8080/weather?city=NAME&date=Y-M-D](5454) - Find weather
+
+Full example:
+* [localhost:8080/weather?city=Ivanovo&code=ru&date=2022-02-28]()
+* [localhost:8080/weather?city=London&date=2022-02-28]()
+
